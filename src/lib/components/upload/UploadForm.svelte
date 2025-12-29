@@ -1,5 +1,6 @@
 <script lang="ts">
     import { BANKS } from '$lib/utils/constants';
+    import { getAccounts } from '$lib/api/metadata/accounts.remote';
 
     interface Props {
         onsubmit?: (data: {
@@ -14,6 +15,8 @@
     let bank = $state<null | keyof typeof BANKS>(null);
     let account = $state<null | string>(null);
     let files = $state<FileList | null>(null);
+
+    const accounts = $derived(await getAccounts());
 
     function handleSubmit(ev: Event) {
         ev.preventDefault();
@@ -53,6 +56,9 @@
                     id="account"
                     required>
                 <option disabled value={null}>Select an account</option>
+                {#each accounts.filter(acc => acc.bank === bank) as acc}
+                    <option value={acc.id}>{acc.name}</option>
+                {/each}
             </select>
         </div>
 

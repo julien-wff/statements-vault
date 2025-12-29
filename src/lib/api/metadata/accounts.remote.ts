@@ -1,4 +1,4 @@
-import { command } from '$app/server';
+import { command, query } from '$app/server';
 import { z } from 'zod';
 import { db } from '$lib/server/db';
 import { account, banksEnum } from '$lib/server/db/schema';
@@ -21,6 +21,7 @@ export const saveAccount = command(
                     bank: data.bank,
                 },
             });
+        await getAccounts().refresh();
     },
 );
 
@@ -28,5 +29,10 @@ export const deleteAccount = command(
     z.number(),
     async (id) => {
         await db.delete(account).where(eq(account.id, id));
+        await getAccounts().refresh();
     },
 );
+
+export const getAccounts = query(async () => {
+    return db.select().from(account).orderBy(account.name);
+});
