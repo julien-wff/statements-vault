@@ -23,6 +23,15 @@
     }
 
     let { transactions, matchingIdsFromPattern, onsetpattern }: Props = $props();
+
+    const fullDateFormatter = new Intl.DateTimeFormat(undefined, {
+        year: 'numeric',
+        month: 'long',
+        weekday: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
 </script>
 
 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -48,7 +57,8 @@
                 {@const isMatching = matchingIdsFromPattern?.includes(tr.id)}
                 <tr class="hover:bg-slate-50/50 transition-colors group {isMatching ? 'bg-emerald-50/50 hover:bg-emerald-100/50!' : ''}">
                     <td class="px-6 py-4 space-y-1">
-                        <div class="flex items-center gap-1.5 text-xs font-bold text-slate-700">
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-slate-700"
+                             title={fullDateFormatter.format(tr.date)}>
                             <Calendar size={12} class="text-slate-400"/>
                             {tr.date.toLocaleDateString()}
                         </div>
