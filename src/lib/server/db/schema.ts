@@ -36,6 +36,7 @@ export const subCategoryRelations = relations(subCategory, ({ one, many }) => ({
         references: [ category.id ],
     }),
     transactions: many(transaction),
+    categoryRules: many(categoryRule),
 }));
 
 export const file = sqliteTable('file', {
@@ -57,6 +58,7 @@ export const transaction = sqliteTable('transaction', {
     description: text().notNull(),
     subCategoryId: text().references(() => subCategory.id),
     predictedBalance: numeric({ mode: 'number' }),
+    withCategoryRule: integer().references(() => categoryRule.id),
 });
 
 export const transactionRelations = relations(transaction, ({ one }) => ({
@@ -72,4 +74,25 @@ export const transactionRelations = relations(transaction, ({ one }) => ({
         fields: [ transaction.subCategoryId ],
         references: [ subCategory.id ],
     }),
+    categoryRule: one(categoryRule, {
+        fields: [ transaction.withCategoryRule ],
+        references: [ categoryRule.id ],
+    }),
+}));
+
+export const categoryRule = sqliteTable('category_rule', {
+    id: integer().primaryKey({ autoIncrement: true }),
+    pattern: text().notNull(),
+    /** If the subcategory is null, matching transactions must be tagged manually **/
+    subCategoryId: text().references(() => subCategory.id),
+    /** true: only credits, false: only debits **/
+    positiveAmount: integer({ mode: 'boolean' }).notNull(),
+});
+
+export const categoryRuleRelations = relations(categoryRule, ({ one, many }) => ({
+    subCategory: one(subCategory, {
+        fields: [ categoryRule.subCategoryId ],
+        references: [ subCategory.id ],
+    }),
+    transactions: many(transaction),
 }));

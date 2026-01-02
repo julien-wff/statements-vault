@@ -23,7 +23,7 @@
 
     const quickActions = [
         { label: 'Upload Statements', icon: Upload, href: '/upload', color: 'bg-green-600' },
-        { label: 'Categorize', icon: Tag, href: '/metadata/categories', color: 'bg-purple-600' },
+        { label: 'Manage categories', icon: Tag, href: '/metadata/categories', color: 'bg-purple-600' },
         { label: 'Manage Accounts', icon: Landmark, href: '/metadata/accounts', color: 'bg-indigo-600' },
     ];
 </script>
@@ -47,7 +47,8 @@
                 {/snippet}
             </StatCard>
 
-            <StatCard icon={CircleAlert}
+            <StatCard href="/categorize"
+                      icon={CircleAlert}
                       iconClass="bg-amber-50 text-amber-600"
                       title="To Categorize"
                       value={uncategorizedCount}
