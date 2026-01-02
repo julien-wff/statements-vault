@@ -19,7 +19,6 @@
     const filesCount = $derived(await getFilesCount());
     const accounts = $derived(await getAccounts());
     const recentFiles = $derived(await getLatestFiles());
-    $inspect(recentFiles);
 
     const quickActions = [
         { label: 'Upload Statements', icon: Upload, href: '/upload', color: 'bg-green-600' },
