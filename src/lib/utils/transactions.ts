@@ -6,7 +6,6 @@ export const cleanTransactionDescription = (description: string) => description
     .replaceAll('achat cb', ' ')
     .replaceAll(/ref(erence)? :? ?[^ ]+/g, ' ')
     .replaceAll(/\d{8,}/g, ' ')
-    .replaceAll('instantane', '')
     .replace(/(samsung|google|apple) pay$/, '')
     .replaceAll(/\s+/g, ' ')
     .trim();
