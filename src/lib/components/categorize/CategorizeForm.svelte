@@ -4,6 +4,7 @@
     import Loader2 from '@lucide/svelte/icons/loader-2';
     import Lightbulb from '@lucide/svelte/icons/lightbulb';
     import SubcategorySearch from './SubcategorySearch.svelte';
+    import type { account } from '$lib/server/db/schema';
 
     interface SubCategory {
         id: string;
@@ -19,6 +20,9 @@
         isSubmitting: boolean;
         suggestedType?: string;
         matchCount: number;
+        accounts: typeof account.$inferSelect[];
+        transferSourceAccountId?: number | null;
+        transferDestinationAccountId?: number | null;
         onsubmit: (e: Event) => void;
     }
 
@@ -29,8 +33,20 @@
         isSubmitting,
         suggestedType,
         matchCount,
+        accounts,
+        transferSourceAccountId = $bindable(),
+        transferDestinationAccountId = $bindable(),
         onsubmit,
     }: Props = $props();
+
+    const isTransfer = $derived(
+        subcategories.find(sub => sub.id === selectedSubCategoryId)?.categoryType === 'Transfer',
+    );
+    const invalidTransfer = $derived(isTransfer && (
+        transferSourceAccountId === null ||
+        transferDestinationAccountId === null ||
+        transferSourceAccountId === transferDestinationAccountId
+    ));
 </script>
 
 <div class="space-y-6">
@@ -67,8 +83,46 @@
                 </p>
             </div>
 
+            {#if isTransfer}
+                <div class="space-y-2">
+                    <label class="text-xs font-black text-slate-400 uppercase tracking-widest"
+                           for="account">
+                        Source account
+                    </label>
+
+                    <select class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            bind:value={transferSourceAccountId}
+                            id="account">
+                        <option value={null} disabled selected>
+                            Select source account
+                        </option>
+                        {#each accounts as account}
+                            <option value={account.id}>{account.name}</option>
+                        {/each}
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-xs font-black text-slate-400 uppercase tracking-widest"
+                           for="account">
+                        Destination account
+                    </label>
+
+                    <select class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            bind:value={transferDestinationAccountId}
+                            id="account">
+                        <option value={null} disabled selected>
+                            Select destination account
+                        </option>
+                        {#each accounts as account}
+                            <option value={account.id}>{account.name}</option>
+                        {/each}
+                    </select>
+                </div>
+            {/if}
+
             <button class="cursor-pointer disabled:cursor-not-allowed w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-2 mt-4"
-                    disabled={!selectedSubCategoryId || isSubmitting}
+                    disabled={!selectedSubCategoryId || isSubmitting || matchCount === 0 || invalidTransfer}
                     type="submit">
                 {#if isSubmitting}
                     <Loader2 class="animate-spin" size={20}/>

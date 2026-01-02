@@ -30,6 +30,9 @@
     let pattern = $derived('%' + cleanTransactionDescription(transactions[0].description) + '%');
     let isSubmitting = $state(false);
 
+    let transferSourceAccountId = $state<number | null>(null);
+    let transferDestinationAccountId = $state<number | null>(null);
+
     const matchingIdsFromPattern = $derived(await testCategoryRule({
         pattern,
         positiveAmount: transactions.length > 0 ? transactions[0].amount >= 0 : true,
@@ -61,8 +64,12 @@
                 pattern,
                 subCategoryId: selectedSubCategoryId,
                 positiveAmount: transactions[0].amount >= 0,
+                transferSourceAccountId: transferSourceAccountId,
+                transferDestinationAccountId: transferDestinationAccountId,
             });
             selectedSubCategoryId = '';
+            transferSourceAccountId = null;
+            transferDestinationAccountId = null;
         } finally {
             isSubmitting = false;
         }
@@ -86,9 +93,12 @@
                             bind:pattern
                             bind:selectedSubCategoryId
                             matchCount={matchingIdsFromPattern.length}
+                            {accounts}
                             {isSubmitting}
                             onsubmit={handleApply}
                             subcategories={allSubCategories}
+                            bind:transferSourceAccountId
+                            bind:transferDestinationAccountId
                             {suggestedType}/>
                 </div>
 

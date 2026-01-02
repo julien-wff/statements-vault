@@ -12,6 +12,10 @@ export const account = sqliteTable('account', {
 
 export const accountRelations = relations(account, ({ many }) => ({
     transactions: many(transaction),
+    transferSourceTransactions: many(transaction),
+    transferDestinationTransactions: many(transaction),
+    transferSourceCategoryRules: many(categoryRule),
+    transferDestinationCategoryRules: many(categoryRule),
 }));
 
 export const category = sqliteTable('category', {
@@ -59,6 +63,8 @@ export const transaction = sqliteTable('transaction', {
     subCategoryId: text().references(() => subCategory.id),
     predictedBalance: numeric({ mode: 'number' }),
     withCategoryRule: integer().references(() => categoryRule.id),
+    transferSourceAccountId: integer().references(() => account.id),
+    transferDestinationAccountId: integer().references(() => account.id),
 });
 
 export const transactionRelations = relations(transaction, ({ one }) => ({
@@ -78,6 +84,14 @@ export const transactionRelations = relations(transaction, ({ one }) => ({
         fields: [ transaction.withCategoryRule ],
         references: [ categoryRule.id ],
     }),
+    transferSourceAccount: one(account, {
+        fields: [ transaction.transferSourceAccountId ],
+        references: [ account.id ],
+    }),
+    transferDestinationAccount: one(account, {
+        fields: [ transaction.transferDestinationAccountId ],
+        references: [ account.id ],
+    }),
 }));
 
 export const categoryRule = sqliteTable('category_rule', {
@@ -87,6 +101,8 @@ export const categoryRule = sqliteTable('category_rule', {
     subCategoryId: text().references(() => subCategory.id),
     /** true: only credits, false: only debits **/
     positiveAmount: integer({ mode: 'boolean' }).notNull(),
+    transferSourceAccountId: integer().references(() => account.id),
+    transferDestinationAccountId: integer().references(() => account.id),
 });
 
 export const categoryRuleRelations = relations(categoryRule, ({ one, many }) => ({
@@ -95,4 +111,12 @@ export const categoryRuleRelations = relations(categoryRule, ({ one, many }) => 
         references: [ subCategory.id ],
     }),
     transactions: many(transaction),
+    transferSourceAccount: one(account, {
+        fields: [ categoryRule.transferSourceAccountId ],
+        references: [ account.id ],
+    }),
+    transferDestinationAccount: one(account, {
+        fields: [ categoryRule.transferDestinationAccountId ],
+        references: [ account.id ],
+    }),
 }));

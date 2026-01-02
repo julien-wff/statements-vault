@@ -50,6 +50,8 @@ const categorizationRuleSchema = z.object({
     pattern: z.string().min(1),
     subCategoryId: z.string().min(1),
     positiveAmount: z.boolean(),
+    transferSourceAccountId: z.number().nullable(),
+    transferDestinationAccountId: z.number().nullable(),
 });
 
 export const applyCategorizationRule = command(categorizationRuleSchema, async (data) => {
@@ -60,6 +62,8 @@ export const applyCategorizationRule = command(categorizationRuleSchema, async (
         .set({
             subCategoryId: data.subCategoryId,
             withCategoryRule: rule[0].id,
+            transferSourceAccountId: data.transferSourceAccountId,
+            transferDestinationAccountId: data.transferDestinationAccountId,
         })
         .where(and(
             like(transaction.description, data.pattern),
