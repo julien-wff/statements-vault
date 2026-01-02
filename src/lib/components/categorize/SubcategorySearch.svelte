@@ -19,17 +19,28 @@
     let searchInput = $state('');
     let isFocused = $state(false);
     let focusedIndex = $state(0);
+    let listRef: HTMLDivElement | null = $state(null);
 
     const filteredSubCategories = $derived(
         searchInput.length > 0
-            ? subcategories.filter(sub =>
-                sub.name.toLowerCase().includes(searchInput.toLowerCase()) ||
-                sub.categoryName.toLowerCase().includes(searchInput.toLowerCase()),
-            ).toSorted((a, b) => {
-                if (a.categoryType === suggestedType && b.categoryType !== suggestedType) return -1;
-                if (a.categoryType !== suggestedType && b.categoryType === suggestedType) return 1;
-                return a.name.localeCompare(b.name);
-            })
+            ? (() => {
+                const query = searchInput.toLowerCase();
+                const matchRank = (sub: SubCategory) => {
+                    if (sub.name.toLowerCase().includes(query)) return 0;
+                    if (sub.categoryName.toLowerCase().includes(query)) return 1;
+                    return 2;
+                };
+
+                return subcategories
+                    .filter(sub => matchRank(sub) < 2)
+                    .toSorted((a, b) => {
+                        const rankDiff = matchRank(a) - matchRank(b);
+                        if (rankDiff !== 0) return rankDiff;
+                        if (a.categoryType === suggestedType && b.categoryType !== suggestedType) return -1;
+                        if (a.categoryType !== suggestedType && b.categoryType === suggestedType) return 1;
+                        return a.name.localeCompare(b.name) || a.categoryName.localeCompare(b.categoryName);
+                    });
+            })()
             : subcategories.toSorted((a, b) => {
                 if (a.categoryType === suggestedType && b.categoryType !== suggestedType) return -1;
                 if (a.categoryType !== suggestedType && b.categoryType === suggestedType) return 1;
@@ -52,8 +63,15 @@
         }
     });
 
+    $effect(() => {
+        if (!isFocused || selectedSubCategoryId) return;
+
+        const el = listRef?.querySelector(`[data-index="${focusedIndex}"]`) as HTMLElement | null;
+        el?.scrollIntoView({ block: 'nearest' });
+    });
+
     function handleKeyDown(e: KeyboardEvent) {
-        if (!searchInput || selectedSubCategoryId) return;
+        if (selectedSubCategoryId || !filteredSubCategories.length) return;
 
         if (e.key === 'ArrowDown') {
             e.preventDefault();
@@ -87,13 +105,15 @@
                 type="text"/>
 
         {#if isFocused && !selectedSubCategoryId}
-            <div class="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto overflow-x-hidden p-1">
+            <div bind:this={listRef}
+                 class="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto overflow-x-hidden p-1">
                 {#each filteredSubCategories as sub, i}
                     <button
                             type="button"
                             onclick={() => {
                                 selectedSubCategoryId = sub.id;
                             }}
+                            data-index={i}
                             class="w-full text-left px-3 py-2 rounded-lg flex items-center justify-between group transition-colors {i === focusedIndex ? 'bg-blue-50 ring-1 ring-blue-200' : 'hover:bg-slate-50'}"
                     >
                         <div>
