@@ -40,7 +40,8 @@ export const getTransactionToCategorize = query(async () => {
         .where(and(
             tr[0].amount > 0 ? gte(transaction.amount, 0) : lte(transaction.amount, 0),
             // @formatter:off
-            eq(sql`substr(${transaction.description}, 0, 20)`, tr[0].name.slice(0, 19))
+            eq(sql`substr(${transaction.description}, 0, 20)`, tr[0].name.slice(0, 19)),
+            isNull(transaction.subCategoryId),
         ))
         .orderBy(sql`RANDOM()`)
         .limit(20);
