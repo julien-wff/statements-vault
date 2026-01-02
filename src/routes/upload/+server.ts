@@ -1,9 +1,11 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
-import { banksEnum } from '$lib/server/db/schema';
+import { banksEnum, file as fileTable, transaction as transactionTable } from '$lib/server/db/schema';
 import * as os from 'node:os';
 import * as path from 'node:path';
+import { parsers } from '$lib/server/parsing';
+import { db } from '$lib/server/db';
 
 const schema = z.object({
     file: z.file(),
@@ -27,9 +29,21 @@ export const POST: RequestHandler = async ({ request }) => {
     const filePath = path.join(os.tmpdir(), file.name);
     await Bun.write(filePath, file);
 
-    // TODO: parse transactions
+    try {
+        const dbFile = await db
+            .insert(fileTable)
+            .values({
+                name: file.name,
+            })
+            .returning();
 
-    await Bun.file(filePath).delete();
+        const { transactions } = await parsers[bank](filePath, dbFile[0].id, account);
+        await db.insert(transactionTable).values(transactions);
+    } catch (e) {
+        return json({ ok: false, error: (e as Error).message }, { status: 500 });
+    } finally {
+        await Bun.file(filePath).delete();
+    }
 
     return json({ ok: true });
 };
