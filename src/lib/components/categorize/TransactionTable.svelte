@@ -14,15 +14,15 @@
         account: {
             name: string;
         };
-
     }
 
     interface Props {
         transactions: Transaction[];
+        matchingIdsFromPattern?: number[];
         onsetpattern?: (pattern: string) => void;
     }
 
-    let { transactions, onsetpattern }: Props = $props();
+    let { transactions, matchingIdsFromPattern, onsetpattern }: Props = $props();
 </script>
 
 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -45,7 +45,8 @@
             <tbody class="divide-y divide-slate-50">
             {#each transactions as tr}
                 {@const cleanDesc = cleanTransactionDescription(tr.description)}
-                <tr class="hover:bg-slate-50/50 transition-colors group">
+                {@const isMatching = matchingIdsFromPattern?.includes(tr.id)}
+                <tr class="hover:bg-slate-50/50 transition-colors group {isMatching ? 'bg-emerald-50/50 hover:bg-emerald-100/50!' : ''}">
                     <td class="px-6 py-4 space-y-1">
                         <div class="flex items-center gap-1.5 text-xs font-bold text-slate-700">
                             <Calendar size={12} class="text-slate-400"/>
@@ -58,6 +59,7 @@
                                 </span>
                         </div>
                     </td>
+
                     <td class="px-6 py-4">
                         <span class="text-sm text-slate-600 font-medium line-clamp-2 leading-snug"
                               title={tr.description}>
@@ -72,6 +74,7 @@
                                             onclick={() => onsetpattern?.(`%${cleanDesc}%`)}/>
                         </span>
                     </td>
+
                     <td class="px-6 py-4 text-right">
                             <span class="text-sm font-black whitespace-nowrap"
                                   class:text-slate-700={tr.amount < 0}

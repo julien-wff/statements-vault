@@ -18,6 +18,7 @@
         pattern: string;
         isSubmitting: boolean;
         suggestedType?: string;
+        matchCount: number;
         onsubmit: (e: Event) => void;
     }
 
@@ -27,6 +28,7 @@
         pattern = $bindable(),
         isSubmitting,
         suggestedType,
+        matchCount,
         onsubmit,
     }: Props = $props();
 </script>
@@ -73,7 +75,7 @@
                     Applying...
                 {:else}
                     <Check size={20}/>
-                    Categorize transactions
+                    Categorize {matchCount} transactions
                 {/if}
             </button>
         </form>

@@ -50,7 +50,7 @@ const categorizationRuleSchema = z.object({
     pattern: z.string().min(1),
     subCategoryId: z.string().min(1),
     positiveAmount: z.boolean(),
-})
+});
 
 export const applyCategorizationRule = command(categorizationRuleSchema, async (data) => {
     const rule = await db.insert(categoryRule).values(data).returning();
@@ -67,4 +67,22 @@ export const applyCategorizationRule = command(categorizationRuleSchema, async (
         ));
 
     await getTransactionToCategorize().refresh();
+});
+
+const ruleTest = z.object({
+    pattern: z.string().min(1),
+    positiveAmount: z.boolean(),
+});
+
+export const testCategoryRule = query(ruleTest, async (data) => {
+    return db
+        .select({
+            id: transaction.id,
+        })
+        .from(transaction)
+        .where(and(
+            like(transaction.description, data.pattern),
+            data.positiveAmount ? gte(transaction.amount, 0) : lte(transaction.amount, 0),
+        ))
+        .then(res => res.map(r => r.id));
 });

@@ -1,5 +1,9 @@
 <script lang="ts">
-    import { applyCategorizationRule, getTransactionToCategorize } from '$lib/api/transactions.remote';
+    import {
+        applyCategorizationRule,
+        getTransactionToCategorize,
+        testCategoryRule,
+    } from '$lib/api/transactions.remote';
     import { getAccounts } from '$lib/api/metadata/accounts.remote';
     import { getCategories } from '$lib/api/metadata/categories.remote';
     import CategorizeHeader from '$lib/components/categorize/CategorizeHeader.svelte';
@@ -23,8 +27,13 @@
     );
 
     let selectedSubCategoryId = $state('');
-    let pattern = $state('');
+    let pattern = $derived('%' + cleanTransactionDescription(transactions[0].description) + '%');
     let isSubmitting = $state(false);
+
+    const matchingIdsFromPattern = $derived(await testCategoryRule({
+        pattern,
+        positiveAmount: transactions.length > 0 ? transactions[0].amount >= 0 : true,
+    }));
 
     const allSubCategories = $derived(
         categories.flatMap(cat =>
@@ -41,12 +50,6 @@
     );
 
     const suggestedType = $derived(avgAmount < 0 ? 'Expense' : 'Income');
-
-    $effect(() => {
-        if (transactions.length > 0) {
-            pattern = '%' + cleanTransactionDescription(transactions[0].description) + '%';
-        }
-    });
 
     async function handleApply(e: Event) {
         e.preventDefault();
@@ -82,6 +85,7 @@
                     <CategorizeForm
                             bind:pattern
                             bind:selectedSubCategoryId
+                            matchCount={matchingIdsFromPattern.length}
                             {isSubmitting}
                             onsubmit={handleApply}
                             subcategories={allSubCategories}
@@ -89,7 +93,10 @@
                 </div>
 
                 <div class="lg:col-span-7">
-                    <TransactionTable {transactions} onsetpattern={p => (pattern = p)}/>
+                    <TransactionTable
+                            {transactions}
+                            {matchingIdsFromPattern}
+                            onsetpattern={p => (pattern = p)}/>
                 </div>
             </div>
         {/if}
