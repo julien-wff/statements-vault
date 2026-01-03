@@ -3,7 +3,7 @@
 
     interface FileEntry {
         name: string;
-        date: string;
+        date: string | null;
         transactions: number;
     }
 
@@ -54,9 +54,11 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 text-center">
-                            <span class="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-md">
-                                {new Date(file.date).toLocaleDateString()}
-                            </span>
+                            {#if file.date}
+                                <span class="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-md">
+                                    {new Date(file.date).toLocaleDateString()}
+                                </span>
+                            {/if}
                         </td>
                         <td class="px-6 py-4 text-center">
                             <span class="text-sm font-black text-slate-600">
