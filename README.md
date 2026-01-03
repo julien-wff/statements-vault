@@ -1,38 +1,32 @@
-# sv
+<p align="center">
+  <h1 align="center">Statements Vault</h1>
+  <p align="center">
+    A tool to parse and classify bank statements for use in budgeting apps like
+    <a href="https://ezbookkeeping.mayswind.net/">ezBookKeeping</a> or
+    <a href="https://simonwep.github.io/ocular/">Ocular</a>.
+  </p>
+</p>
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+![demo](https://github.com/user-attachments/assets/6ebfd28d-a9b2-43d6-bb15-19074f2ec9de)
 
-## Creating a project
+Most self-hosted budgeting software don't implement bank imports, especially from PDF statements.
+**Statements Vault** serves as an intermediate layer to ingest these files, handle the classification with a better UX
+than typical budgeting apps, and prepare the data for export.
 
-If you're seeing this, you've probably already done this step. Congrats!
+### What it does
 
-```sh
-# create a new project in the current directory
-npx sv create
+- **Parsing**: Supports Revolut (French CSV), PayPal (CSV), and La Banque Postale (PDF).
+- **Categorization**: A dedicated interface to quickly tag transactions.
+- **Rule Engine**: Create rules based on transaction descriptions to automate classification for future imports.
+- **Export**: Generate CSV files formatted for ezBookKeeping or Ocular.
 
-# create a new project in my-app
-npx sv create my-app
-```
+### Philosophy
 
-## Developing
+This is a pragmatic tool built for personal use. It doesn't track net worth or manage budgets; it just makes getting
+data from your bank into your budgeting app faster and more accurate.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### Setup
 
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+1. **Install**: `bun install`
+2. **Database**: `bun db:push`
+3. **Run**: `bun dev`
