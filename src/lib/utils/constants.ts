@@ -7,4 +7,8 @@ export const BANKS = {
         name: 'Revolut',
         acceptedFormats: [ 'text/csv' ],
     },
+    paypal: {
+        name: 'PayPal',
+        acceptedFormats: [ 'text/csv' ],
+    },
 } as const;

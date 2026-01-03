@@ -40,6 +40,7 @@ export const POST: RequestHandler = async ({ request }) => {
         const { transactions } = await parsers[bank](filePath, dbFile[0].id, account);
         await db.insert(transactionTable).values(transactions);
     } catch (e) {
+        console.error(e);
         return json({ ok: false, error: (e as Error).message }, { status: 500 });
     } finally {
         await Bun.file(filePath).delete();

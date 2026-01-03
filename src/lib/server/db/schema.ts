@@ -1,7 +1,7 @@
 import { integer, numeric, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
 
-export const banksEnum = [ 'revolut', 'lbp' ] as const;
+export const banksEnum = [ 'revolut', 'lbp', 'paypal' ] as const;
 export const CATEGORY_TYPE = [ 'Income', 'Expense', 'Transfer' ] as const;
 
 export const account = sqliteTable('account', {
