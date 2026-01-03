@@ -1,7 +1,7 @@
 import { command, query } from '$app/server';
 import { db } from '$lib/server/db';
 import { categoryRule, transaction } from '$lib/server/db/schema';
-import { and, count, desc, eq, gte, isNull, like, lte, sql } from 'drizzle-orm';
+import { and, count, desc, eq, gte, inArray, isNull, like, lte, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
 export const getTransactionsCount = query(async () => {
@@ -70,6 +70,26 @@ export const applyCategorizationRule = command(categorizationRuleSchema, async (
             like(transaction.description, data.pattern),
             data.positiveAmount ? gte(transaction.amount, 0) : lte(transaction.amount, 0),
         ));
+
+    await getTransactionToCategorize().refresh();
+});
+
+const categorizationSchema = z.object({
+    transactionIds: z.array(z.number()).min(1),
+    subCategoryId: z.string().min(1),
+    transferSourceAccountId: z.number().nullable(),
+    transferDestinationAccountId: z.number().nullable(),
+});
+
+export const categorizeTransactions = command(categorizationSchema, async (data) => {
+    await db
+        .update(transaction)
+        .set({
+            subCategoryId: data.subCategoryId,
+            transferSourceAccountId: data.transferSourceAccountId,
+            transferDestinationAccountId: data.transferDestinationAccountId,
+        })
+        .where(inArray(transaction.id, data.transactionIds));
 
     await getTransactionToCategorize().refresh();
 });

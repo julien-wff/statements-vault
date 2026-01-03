@@ -20,9 +20,15 @@
         transactions: Transaction[];
         matchingIdsFromPattern?: number[];
         onsetpattern?: (pattern: string) => void;
+        selectedIds?: number[];
     }
 
-    let { transactions, matchingIdsFromPattern, onsetpattern }: Props = $props();
+    let {
+        transactions,
+        matchingIdsFromPattern,
+        onsetpattern,
+        selectedIds = $bindable([]),
+    }: Props = $props();
 
     const fullDateFormatter = new Intl.DateTimeFormat(undefined, {
         year: 'numeric',
@@ -32,6 +38,22 @@
         hour: '2-digit',
         minute: '2-digit',
     });
+
+    function toggleAll() {
+        if (selectedIds.length === transactions.length) {
+            selectedIds = [];
+        } else {
+            selectedIds = transactions.map(tr => tr.id);
+        }
+    }
+
+    function toggleSelection(id: number) {
+        if (selectedIds.includes(id)) {
+            selectedIds = selectedIds.filter(i => i !== id);
+        } else {
+            selectedIds = [ ...selectedIds, id ];
+        }
+    }
 </script>
 
 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -39,6 +61,12 @@
         <table class="w-full text-left border-collapse">
             <thead class="sticky top-0 z-10">
             <tr class="bg-slate-50/90 backdrop-blur-sm border-b border-slate-100">
+                <th class="pl-6 py-4 w-10">
+                    <input checked={selectedIds.length === transactions.length && transactions.length > 0}
+                           class="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                           onchange={toggleAll}
+                           type="checkbox"/>
+                </th>
                 <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                     Date
                 </th>
@@ -55,7 +83,14 @@
             {#each transactions as tr}
                 {@const cleanDesc = cleanTransactionDescription(tr.description)}
                 {@const isMatching = matchingIdsFromPattern?.includes(tr.id)}
-                <tr class="hover:bg-slate-50/50 transition-colors group {isMatching ? 'bg-emerald-50/50 hover:bg-emerald-100/50!' : ''}">
+                {@const isSelected = selectedIds.includes(tr.id)}
+                <tr class="hover:bg-slate-50/50 transition-colors group {isSelected ? 'bg-blue-50/50 hover:bg-blue-100/50!' : (isMatching ? 'bg-emerald-50/50 hover:bg-emerald-100/50!' : '')}">
+                    <td class="pl-6 py-4">
+                        <input type="checkbox"
+                               class="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                               checked={isSelected}
+                               onchange={() => toggleSelection(tr.id)}/>
+                    </td>
                     <td class="px-6 py-4 space-y-1">
                         <div class="flex items-center gap-1.5 text-xs font-bold text-slate-700"
                              title={fullDateFormatter.format(tr.date)}>

@@ -1,6 +1,7 @@
 <script lang="ts">
     import {
         applyCategorizationRule,
+        categorizeTransactions,
         getTransactionToCategorize,
         testCategoryRule,
     } from '$lib/api/transactions.remote';
@@ -29,14 +30,33 @@
     let selectedSubCategoryId = $state('');
     let pattern = $derived('%' + cleanTransactionDescription(transactions[0].description) + '%');
     let isSubmitting = $state(false);
+    let createRule = $state(true);
+    let selectedIds = $state<number[]>([]);
 
     let transferSourceAccountId = $state<number | null>(null);
     let transferDestinationAccountId = $state<number | null>(null);
 
-    const matchingIdsFromPattern = $derived(await testCategoryRule({
-        pattern,
-        positiveAmount: transactions.length > 0 ? transactions[0].amount >= 0 : true,
-    }));
+    let lastFirstTransactionId = $state<number | null>(null);
+    $effect(() => {
+        const firstId = transactions[0]?.id ?? null;
+        if (firstId !== lastFirstTransactionId) {
+            lastFirstTransactionId = firstId;
+            if (transactions[0]) {
+                pattern = '%' + cleanTransactionDescription(transactions[0].description) + '%';
+            } else {
+                pattern = '';
+            }
+            selectedIds = [];
+        }
+    });
+
+    const matchingIdsFromPattern = $derived(pattern
+        ? await testCategoryRule({
+            pattern,
+            positiveAmount: transactions.length > 0 ? transactions[0].amount >= 0 : true,
+        })
+        : [],
+    );
 
     const allSubCategories = $derived(
         categories.flatMap(cat =>
@@ -56,17 +76,28 @@
 
     async function handleApply(e: Event) {
         e.preventDefault();
-        if (!selectedSubCategoryId || !pattern) return;
+        if (!selectedSubCategoryId) return;
+        if (createRule && !pattern) return;
+        if (!createRule && selectedIds.length === 0) return;
 
         isSubmitting = true;
         try {
-            await applyCategorizationRule({
-                pattern,
-                subCategoryId: selectedSubCategoryId,
-                positiveAmount: transactions[0].amount >= 0,
-                transferSourceAccountId: transferSourceAccountId,
-                transferDestinationAccountId: transferDestinationAccountId,
-            });
+            if (createRule) {
+                await applyCategorizationRule({
+                    pattern,
+                    subCategoryId: selectedSubCategoryId,
+                    positiveAmount: transactions[0].amount >= 0,
+                    transferSourceAccountId: transferSourceAccountId,
+                    transferDestinationAccountId: transferDestinationAccountId,
+                });
+            } else {
+                await categorizeTransactions({
+                    transactionIds: selectedIds,
+                    subCategoryId: selectedSubCategoryId,
+                    transferSourceAccountId: transferSourceAccountId,
+                    transferDestinationAccountId: transferDestinationAccountId,
+                });
+            }
             selectedSubCategoryId = '';
             transferSourceAccountId = null;
             transferDestinationAccountId = null;
@@ -93,6 +124,8 @@
                             bind:pattern
                             bind:selectedSubCategoryId
                             matchCount={matchingIdsFromPattern.length}
+                            selectedCount={selectedIds.length}
+                            bind:createRule
                             {accounts}
                             {isSubmitting}
                             onsubmit={handleApply}
@@ -106,6 +139,7 @@
                     <TransactionTable
                             {transactions}
                             {matchingIdsFromPattern}
+                            bind:selectedIds
                             onsetpattern={p => (pattern = p)}/>
                 </div>
             </div>

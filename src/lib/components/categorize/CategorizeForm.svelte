@@ -20,6 +20,8 @@
         isSubmitting: boolean;
         suggestedType?: string;
         matchCount: number;
+        selectedCount: number;
+        createRule: boolean;
         accounts: typeof account.$inferSelect[];
         transferSourceAccountId?: number | null;
         transferDestinationAccountId?: number | null;
@@ -33,6 +35,8 @@
         isSubmitting,
         suggestedType,
         matchCount,
+        selectedCount,
+        createRule = $bindable(true),
         accounts,
         transferSourceAccountId = $bindable(),
         transferDestinationAccountId = $bindable(),
@@ -55,33 +59,46 @@
             <div class="bg-purple-50 text-purple-600 p-1.5 rounded-lg">
                 <Tag size={18}/>
             </div>
-            <h2 class="font-bold text-slate-800">Classification Rule</h2>
+            <h2 class="font-bold text-slate-800">Classification</h2>
         </div>
 
         <form class="space-y-4" onsubmit={onsubmit}>
+            <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                <input bind:checked={createRule}
+                       class="w-4 h-4 rounded border-slate-300 accent-blue-600 focus:ring-blue-500"
+                       id="createRule"
+                       type="checkbox"/>
+                <label class="text-sm font-bold text-slate-700 cursor-pointer select-none"
+                       for="createRule">
+                    Create a categorization rule
+                </label>
+            </div>
+
             <SubcategorySearch
                     bind:selectedSubCategoryId
                     {subcategories}
                     {suggestedType}
             />
 
-            <div class="space-y-2">
-                <label class="text-xs font-black text-slate-400 uppercase tracking-widest"
-                       for="pattern">
-                    Match Pattern (SQLite LIKE)
-                </label>
+            {#if createRule}
+                <div class="space-y-2">
+                    <label class="text-xs font-black text-slate-400 uppercase tracking-widest"
+                           for="pattern">
+                        Match Pattern (SQLite LIKE)
+                    </label>
 
-                <input
-                        bind:value={pattern}
-                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                        id="pattern"
-                        placeholder="Description pattern..."
-                        type="text"/>
+                    <input
+                            bind:value={pattern}
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            id="pattern"
+                            placeholder="Description pattern..."
+                            type="text"/>
 
-                <p class="text-[10px] text-slate-400 font-medium italic">
-                    Use % as a wildcard to match any characters.
-                </p>
-            </div>
+                    <p class="text-[10px] text-slate-400 font-medium italic">
+                        Use % as a wildcard to match any characters.
+                    </p>
+                </div>
+            {/if}
 
             {#if isTransfer}
                 <div class="space-y-2">
@@ -122,14 +139,14 @@
             {/if}
 
             <button class="cursor-pointer disabled:cursor-not-allowed w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-2 mt-4"
-                    disabled={!selectedSubCategoryId || isSubmitting || matchCount === 0 || invalidTransfer}
+                    disabled={!selectedSubCategoryId || isSubmitting || invalidTransfer || (createRule ? (matchCount === 0 || !pattern) : selectedCount === 0)}
                     type="submit">
                 {#if isSubmitting}
                     <Loader2 class="animate-spin" size={20}/>
                     Applying...
                 {:else}
                     <Check size={20}/>
-                    Categorize {matchCount} transactions
+                    Categorize {createRule ? matchCount : selectedCount} transactions
                 {/if}
             </button>
         </form>
