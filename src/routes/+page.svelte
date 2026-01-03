@@ -2,6 +2,7 @@
     import ArrowRight from '@lucide/svelte/icons/arrow-right';
     import CircleAlert from '@lucide/svelte/icons/circle-alert';
     import CircleCheck from '@lucide/svelte/icons/circle-check';
+    import Download from '@lucide/svelte/icons/download';
     import FileText from '@lucide/svelte/icons/file-text';
     import Landmark from '@lucide/svelte/icons/landmark';
     import Tag from '@lucide/svelte/icons/tag';
@@ -22,8 +23,9 @@
 
     const quickActions = [
         { label: 'Upload Statements', icon: Upload, href: '/upload', color: 'bg-green-600' },
-        { label: 'Manage categories', icon: Tag, href: '/metadata/categories', color: 'bg-purple-600' },
+        { label: 'Manage Categories', icon: Tag, href: '/metadata/categories', color: 'bg-purple-600' },
         { label: 'Manage Accounts', icon: Landmark, href: '/metadata/accounts', color: 'bg-indigo-600' },
+        { label: 'Export Transactions', icon: Download, href: '/', color: 'bg-amber-600' },
     ];
 </script>
 
