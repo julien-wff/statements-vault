@@ -16,6 +16,7 @@
 		"db:studio": "drizzle-kit studio"
 	},
 	"devDependencies": {
+		"@fontsource-variable/noto-sans": "^5.2.10",
 		"@libsql/client": "^0.15.15",
 		"@lucide/svelte": "^0.562.0",
 		"@sveltejs/adapter-node": "^5.4.0",
