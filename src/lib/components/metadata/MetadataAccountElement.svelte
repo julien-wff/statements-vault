@@ -3,6 +3,9 @@
     import { deleteAccount, saveAccount } from '$lib/api/metadata/accounts.remote';
     import { BANKS } from '$lib/utils/constants';
     import { onMount } from 'svelte';
+    import Save from '@lucide/svelte/icons/save';
+    import Trash2 from '@lucide/svelte/icons/trash-2';
+    import Loader2 from '@lucide/svelte/icons/loader-2';
 
     interface Props {
         accountData: Omit<typeof account.$inferSelect, 'bank'> & {
@@ -72,32 +75,59 @@
     }
 </script>
 
-<form class="p-2 bg-blue-50 rounded-lg shadow space-y-2" onsubmit={handleSave}>
-    <input bind:value={accountData.name}
-           class="block w-full border border-slate-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-           placeholder="Account Name"
-           required/>
+<form class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-4 hover:border-indigo-200 transition-colors group"
+      onsubmit={handleSave}>
+    <div class="space-y-3">
+        <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 px-1"
+                   for="name-{accountData.id}">
+                Account Name
+            </label>
+            <input bind:value={accountData.name}
+                   class="block w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm"
+                   id="name-{accountData.id}"
+                   placeholder="e.g. Main Checking"
+                   required/>
+        </div>
 
-    <select bind:value={accountData.bank}
-            class="block w-full border border-slate-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:text-slate-400"
-            required>
-        <option disabled value={null}>Select a bank</option>
-        {#each Object.entries(BANKS) as [ key, bankInfo ]}
-            <option value={key}>{bankInfo.name}</option>
-        {/each}
-    </select>
+        <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 px-1"
+                   for="bank-{accountData.id}">
+                Bank Provider
+            </label>
+            <select bind:value={accountData.bank}
+                    class="block w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm disabled:bg-slate-100 disabled:text-slate-400"
+                    id="bank-{accountData.id}"
+                    required>
+                <option disabled value={null}>Select a bank</option>
+                {#each Object.entries(BANKS) as [ key, bankInfo ]}
+                    <option value={key}>{bankInfo.name}</option>
+                {/each}
+            </select>
+        </div>
+    </div>
 
-    <div class="grid grid-cols-2 gap-2">
-        <button class="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+    <div class="flex items-center gap-2 pt-2">
+        <button class="flex-1 cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 text-sm font-bold shadow-sm shadow-indigo-100"
                 disabled={saveLoading || !isModified}
                 type="submit">
+            {#if saveLoading}
+                <Loader2 class="animate-spin" size={16}/>
+            {:else}
+                <Save size={16}/>
+            {/if}
             Save
         </button>
-        <button class="cursor-pointer bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+        <button class="cursor-pointer bg-white text-slate-400 p-2 rounded-xl hover:bg-red-50 hover:text-red-600 border border-slate-200 hover:border-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 disabled={deleteLoading}
                 onclick={handleDelete}
+                title="Delete account"
                 type="button">
-            Delete
+            {#if deleteLoading}
+                <Loader2 class="animate-spin" size={16}/>
+            {:else}
+                <Trash2 size={16}/>
+            {/if}
         </button>
     </div>
 </form>
