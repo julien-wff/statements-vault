@@ -11,7 +11,7 @@
 </script>
 
 <svelte:head>
-    <title>Manage Accounts</title>
+    <title>Manage Accounts | Statements Vault</title>
 </svelte:head>
 
 <main class="min-h-screen bg-slate-100 p-4 md:p-8 font-sans text-slate-900">

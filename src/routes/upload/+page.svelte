@@ -14,7 +14,7 @@
 </script>
 
 <svelte:head>
-    <title>Upload statements</title>
+    <title>Upload statements | Statements Vault</title>
 </svelte:head>
 
 <main class="h-screen grid place-content-center bg-slate-100">
