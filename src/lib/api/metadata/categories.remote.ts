@@ -7,10 +7,12 @@ const categorySchema = z.object({
     id: z.string(),
     name: z.string(),
     hidden: z.boolean(),
+    color: z.string(),
     subCategories: z.array(z.object({
         id: z.string(),
         name: z.string(),
         hidden: z.boolean(),
+        color: z.string(),
     })),
 });
 
@@ -44,6 +46,7 @@ export const updateCategories = command(categoriesSchema, async ({ result: data 
                 id: cat.id,
                 name: cat.name,
                 type: typeMap[typeKey],
+                color: cat.color,
             }).run();
 
             for (const subCat of cat.subCategories) {
@@ -51,6 +54,7 @@ export const updateCategories = command(categoriesSchema, async ({ result: data 
                     id: subCat.id,
                     name: subCat.name,
                     categoryId: cat.id,
+                    color: subCat.color,
                 }).run();
             }
         }

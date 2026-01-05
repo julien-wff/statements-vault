@@ -22,6 +22,7 @@ export const category = sqliteTable('category', {
     id: text().primaryKey(),
     name: text().notNull(),
     type: text({ enum: CATEGORY_TYPE }).notNull(),
+    color: text().notNull(),
 });
 
 export const categoryRelations = relations(category, ({ many }) => ({
@@ -31,6 +32,7 @@ export const categoryRelations = relations(category, ({ many }) => ({
 export const subCategory = sqliteTable('sub_category', {
     id: text().primaryKey(),
     name: text().notNull(),
+    color: text().notNull(),
     categoryId: text().notNull().references(() => category.id),
 });
 

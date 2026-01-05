@@ -9,6 +9,7 @@
     interface SubCategory {
         id: string;
         name: string;
+        color: string;
         categoryName: string;
         categoryType: string;
     }
