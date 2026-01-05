@@ -45,6 +45,10 @@ export const updateCategories = command(categoriesSchema, async ({ result: data 
         const categories = data[typeKey];
 
         for (const cat of categories) {
+            if (cat.hidden) {
+                continue;
+            }
+
             db.insert(category).values({
                 id: cat.id,
                 name: cat.name,
@@ -54,6 +58,10 @@ export const updateCategories = command(categoriesSchema, async ({ result: data 
             }).run();
 
             for (const subCat of cat.subCategories) {
+                if (subCat.hidden) {
+                    continue;
+                }
+
                 db.insert(subCategory).values({
                     id: subCat.id,
                     name: subCat.name,
