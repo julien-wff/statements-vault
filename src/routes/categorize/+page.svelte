@@ -12,6 +12,7 @@
     import CategorizeForm from '$lib/components/categorize/CategorizeForm.svelte';
     import TransactionTable from '$lib/components/categorize/TransactionTable.svelte';
     import { cleanTransactionDescription } from '$lib/utils/transactions';
+    import 'line-awesome/dist/line-awesome/css/line-awesome.min.css';
 
     const accounts = $derived(await getAccounts());
     const categories = $derived(await getCategories());

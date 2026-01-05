@@ -5,6 +5,7 @@
         id: string;
         name: string;
         color: string;
+        icon: string;
         categoryName: string;
         categoryType: string;
     }
@@ -116,19 +117,24 @@
                                 selectedSubCategoryId = sub.id;
                             }}
                             data-index={i}
-                            class="w-full text-left px-3 py-2 rounded-lg flex items-center justify-between group transition-colors"
+                            class="w-full text-left px-3 py-2 rounded-lg flex items-center justify-between group"
                             class:hover:bg-slate-50={!isSubCategoryFocused}
                             style={isSubCategoryFocused ? `border: 1px solid #${sub.color}; background: color-mix(in oklab, #${sub.color} 15%, transparent 85%);` : 'border: 1px solid transparent;'}
                     >
-                        <div>
-                            <div class="text-sm font-bold text-slate-700">
-                                {sub.name}
+                        <div class="flex items-center gap-2">
+                            <div class="size-8 bg-slate-100 rounded-full flex items-center justify-center group-hover:bg-slate-200"
+                                 class:bg-slate-200={isSubCategoryFocused}
+                            >
+                                <i class="{sub.icon} text-slate-500 text-lg" style="color: #{sub.color};"></i>
                             </div>
-                            <div class="text-[10px] text-slate-400 uppercase font-black">{sub.categoryName}</div>
+                            <div>
+                                <div class="text-sm font-bold text-slate-700">
+                                    {sub.name}
+                                </div>
+                                <div class="text-[10px] text-slate-400 uppercase font-black">{sub.categoryName}</div>
+                            </div>
                         </div>
-                        <div
-                            class="text-[10px] font-black px-2 py-1 rounded transition-colors bg-slate-100 text-slate-500 group-hover:bg-slate-200"
-                        >
+                        <div class="text-[10px] font-black px-2 py-1 rounded bg-slate-100 text-slate-500 group-hover:bg-slate-200">
                             {sub.categoryType}
                         </div>
                     </button>

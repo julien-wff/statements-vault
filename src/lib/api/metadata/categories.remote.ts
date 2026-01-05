@@ -1,4 +1,5 @@
 import { command, query } from '$app/server';
+import { getCategoryIcon } from '$lib/utils/category-icons';
 import { z } from 'zod';
 import { db } from '$lib/server/db';
 import { category, subCategory } from '$lib/server/db/schema';
@@ -8,11 +9,13 @@ const categorySchema = z.object({
     name: z.string(),
     hidden: z.boolean(),
     color: z.string(),
+    icon: z.string(),
     subCategories: z.array(z.object({
         id: z.string(),
         name: z.string(),
         hidden: z.boolean(),
         color: z.string(),
+        icon: z.string(),
     })),
 });
 
@@ -47,6 +50,7 @@ export const updateCategories = command(categoriesSchema, async ({ result: data 
                 name: cat.name,
                 type: typeMap[typeKey],
                 color: cat.color,
+                icon: getCategoryIcon(cat.icon),
             }).run();
 
             for (const subCat of cat.subCategories) {
@@ -55,6 +59,7 @@ export const updateCategories = command(categoriesSchema, async ({ result: data 
                     name: subCat.name,
                     categoryId: cat.id,
                     color: subCat.color,
+                    icon: getCategoryIcon(subCat.icon),
                 }).run();
             }
         }
