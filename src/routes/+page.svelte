@@ -7,6 +7,7 @@
     import Landmark from '@lucide/svelte/icons/landmark';
     import Tag from '@lucide/svelte/icons/tag';
     import Upload from '@lucide/svelte/icons/upload';
+    import GitFork from '@lucide/svelte/icons/git-fork';
     import DashboardHeader from '$lib/components/dashboard/DashboardHeader.svelte';
     import StatCard from '$lib/components/dashboard/StatCard.svelte';
     import QuickActions from '$lib/components/dashboard/QuickActions.svelte';
@@ -25,6 +26,7 @@
         { label: 'Upload Statements', icon: Upload, href: '/upload', color: 'bg-green-600' },
         { label: 'Manage Categories', icon: Tag, href: '/metadata/categories', color: 'bg-purple-600' },
         { label: 'Manage Accounts', icon: Landmark, href: '/metadata/accounts', color: 'bg-indigo-600' },
+        { label: 'Manage Category Rules', icon: GitFork, href: '/metadata/rules', color: 'bg-red-600' },
         { label: 'Export Transactions', icon: Download, href: '/', color: 'bg-amber-600' },
     ];
 </script>

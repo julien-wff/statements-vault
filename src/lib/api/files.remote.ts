@@ -20,8 +20,8 @@ export const getLatestFiles = query(async () => {
         .from(file)
         .leftJoin(transaction, eq(transaction.fileId, file.id))
         .leftJoin(account, eq(transaction.accountId, account.id))
-        .orderBy(desc(transaction.date))
-        .limit(5)
+        .orderBy(file => desc(file.date))
+        .limit(6)
         .groupBy(file.id);
 });
 
