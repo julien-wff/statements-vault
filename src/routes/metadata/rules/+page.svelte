@@ -139,12 +139,11 @@
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="flex items-center justify-end gap-2">
-                                            <button
-                                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                    title="View transactions"
-                                            >
+                                            <a href="/metadata/rules/{rule.id}"
+                                               class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                               title="View transactions">
                                                 <List size={18}/>
-                                            </button>
+                                            </a>
                                             <button
                                                     class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                                     disabled={deletingRuleId === rule.id}

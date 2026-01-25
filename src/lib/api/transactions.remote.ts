@@ -111,3 +111,9 @@ export const testCategoryRule = query(ruleTest, async (data) => {
         ))
         .then(res => res.map(r => r.id));
 });
+
+export const getTransactionsByRule = query(z.int().positive(), async (ruleId) => {
+    return db.query.transaction.findMany({
+        where: eq(transaction.withCategoryRule, ruleId),
+    });
+});

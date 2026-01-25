@@ -4,6 +4,27 @@ import { categoryRule, transaction } from '$lib/server/db/schema';
 import { count, desc, eq, sum } from 'drizzle-orm';
 import { z } from 'zod';
 
+export const getCategoryRuleById = query(z.int().positive(), async (ruleId) => {
+    const rules = await db
+        .select({
+            id: categoryRule.id,
+            pattern: categoryRule.pattern,
+            subCategoryId: categoryRule.subCategoryId,
+            positiveAmount: categoryRule.positiveAmount,
+            transferSourceAccountId: categoryRule.transferSourceAccountId,
+            transferDestinationAccountId: categoryRule.transferDestinationAccountId,
+            timeUsed: count(transaction.id),
+            totalAmount: sum(transaction.amount),
+            currency: transaction.currency,
+        })
+        .from(categoryRule)
+        .leftJoin(transaction, eq(categoryRule.id, transaction.withCategoryRule))
+        .where(eq(categoryRule.id, ruleId))
+        .groupBy(categoryRule.id);
+
+    return rules[0] ?? null;
+});
+
 export const getCategoryRules = query(async () => {
     return db
         .select({
