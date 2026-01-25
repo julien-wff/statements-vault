@@ -29,7 +29,7 @@
     );
 
     let selectedSubCategoryId = $state('');
-    let pattern = $derived('%' + cleanTransactionDescription(transactions[0].description) + '%');
+    let pattern = $derived('%' + cleanTransactionDescription(transactions[0]?.description ?? '') + '%');
     let isSubmitting = $state(false);
     let createRule = $state(true);
     let selectedIds = $state<number[]>([]);
@@ -48,15 +48,19 @@
                 pattern = '';
             }
             selectedIds = [];
+            selectedSubCategoryId = '';
+            transferSourceAccountId = null;
+            transferDestinationAccountId = null;
         }
     });
 
-    const matchingIdsFromPattern = $derived(pattern
-        ? await testCategoryRule({
-            pattern,
-            positiveAmount: transactions.length > 0 ? transactions[0].amount >= 0 : true,
-        })
-        : [],
+    const matchingIdsFromPattern = $derived(
+        pattern && transactions.length > 0
+            ? await testCategoryRule({
+                pattern,
+                positiveAmount: transactions[0].amount >= 0,
+            })
+            : [],
     );
 
     const allSubCategories = $derived(

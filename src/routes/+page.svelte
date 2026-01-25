@@ -51,11 +51,11 @@
             </StatCard>
 
             <StatCard href="/categorize"
-                      icon={CircleAlert}
-                      iconClass="bg-amber-50 text-amber-600"
+                      icon={uncategorizedCount === 0 ? Tag : CircleAlert}
+                      iconClass={uncategorizedCount === 0 ? "bg-purple-50 text-purple-600" : "bg-amber-50 text-amber-600"}
                       title="To Categorize"
                       value={uncategorizedCount}
-                      valueClass="text-amber-600">
+                      valueClass={uncategorizedCount === 0 ? "" : "text-amber-600"}>
                 {#snippet footer()}
                     {#if uncategorizedCount === 0}
                         <div class="flex items-center gap-1 text-xs text-slate-400 mt-2">

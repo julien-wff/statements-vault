@@ -27,6 +27,11 @@ export const getTransactionToCategorize = query(async () => {
         .orderBy(desc(count()))
         .limit(1);
 
+    // Return empty array if no uncategorized transactions
+    if (tr.length === 0) {
+        return [];
+    }
+
     return db
         .select({
             id: transaction.id,
