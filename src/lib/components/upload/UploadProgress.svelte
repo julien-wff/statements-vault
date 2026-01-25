@@ -6,6 +6,7 @@
     import Check from '@lucide/svelte/icons/check';
     import X from '@lucide/svelte/icons/x';
     import Loader2 from '@lucide/svelte/icons/loader-2';
+    import { applyAllRulesToAllTransactions } from '$lib/api/metadata/category-rules.remote';
 
     interface Props {
         files: File[];
@@ -20,6 +21,8 @@
     let errorFiles = new SvelteSet<string>();
     let currentUploadIndex = $state(0);
     let uploadComplete = $state(false);
+    let classifiedCount = $state<number | null>(null);
+    let isClassifying = $state(false);
 
     async function scrollToFile(fileIndex: number) {
         await tick();
@@ -27,9 +30,22 @@
         el?.scrollIntoView({ behavior: 'instant', block: 'end' });
     }
 
+    async function applyRules() {
+        isClassifying = true;
+        try {
+            classifiedCount = await applyAllRulesToAllTransactions();
+        } catch (e) {
+            console.error('Failed to apply rules:', e);
+            classifiedCount = 0;
+        } finally {
+            isClassifying = false;
+        }
+    }
+
     async function uploadFileByIndex(fileIndex: number) {
         if (fileIndex >= files.length) {
             uploadComplete = true;
+            await applyRules();
             return;
         }
 
@@ -95,10 +111,25 @@
         {/each}
     </div>
 
+    {#if uploadComplete}
+        <div class="mt-4 p-3 rounded-lg bg-slate-50 text-center">
+            {#if isClassifying}
+                <div class="flex items-center justify-center gap-2 text-slate-600">
+                    <Loader2 class="animate-spin" size={16}/>
+                    <span class="text-sm font-medium">Classifying transactions...</span>
+                </div>
+            {:else if classifiedCount !== null}
+                <p class="text-sm font-medium text-green-600">
+                    {classifiedCount} transaction{classifiedCount === 1 ? '' : 's'} automatically classified
+                </p>
+            {/if}
+        </div>
+    {/if}
+
     <a class="block text-center mt-6 w-full bg-blue-600 text-white py-2.5 px-4 rounded-lg font-medium hover:bg-blue-700 shadow-lg shadow-blue-200 cursor-pointer transition-colors"
-       class:bg-slate-400={!uploadComplete}
-       class:pointer-events-none={!uploadComplete}
-       class:shadow-slate-200={!uploadComplete}
+       class:bg-slate-400={!uploadComplete || isClassifying}
+       class:pointer-events-none={!uploadComplete || isClassifying}
+       class:shadow-slate-200={!uploadComplete || isClassifying}
        href="/">
         Done
     </a>

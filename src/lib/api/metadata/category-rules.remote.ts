@@ -3,6 +3,7 @@ import { db } from '$lib/server/db';
 import { categoryRule, transaction } from '$lib/server/db/schema';
 import { count, desc, eq, sum } from 'drizzle-orm';
 import { z } from 'zod';
+import { applyRulesOnAllTransactions } from '$lib/server/rules/apply-rules';
 
 export const getCategoryRuleById = query(z.int().positive(), async (ruleId) => {
     const rules = await db
@@ -57,4 +58,8 @@ export const deleteCategoryRule = command(ruleDeleteSchema, async (ruleId) => {
     await db.delete(categoryRule).where(eq(categoryRule.id, ruleId));
 
     await getCategoryRules().refresh();
+});
+
+export const applyAllRulesToAllTransactions = command(async () => {
+    return applyRulesOnAllTransactions().then(r => r.length);
 });
