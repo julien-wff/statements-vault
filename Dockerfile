@@ -17,11 +17,8 @@ WORKDIR /app
 
 # Install app
 
-COPY package.json bun.lock ./
-RUN bun install drizzle-kit@^0.31.8 @libsql/client@^0.15.15
-
 COPY drizzle.config.ts ./
-COPY ./src/lib/server/db/schema.ts ./src/lib/server/db/schema.ts
+COPY ./drizzle ./drizzle
 COPY --from=builder /app/build .
 
 # Metadata
@@ -31,4 +28,4 @@ ENV NODE_ENV="production"
 EXPOSE 3000
 VOLUME ["/app/db"]
 
-CMD ["sh", "-c", "bun run db:push --force && bun ."]
+CMD ["sh", "-c", "bun ."]
