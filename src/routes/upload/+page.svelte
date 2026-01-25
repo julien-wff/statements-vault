@@ -17,10 +17,12 @@
     <title>Upload statements | Statements Vault</title>
 </svelte:head>
 
-<main class="h-screen grid place-content-center bg-slate-100">
-    {#if files.length === 0}
-        <UploadForm onsubmit={handleSubmit}/>
-    {:else}
-        <UploadProgress {files} {bank} {account}/>
-    {/if}
+<main class="min-h-screen grid place-content-center bg-slate-100 p-4 md:p-8 font-sans text-slate-900">
+    <div class="w-full sm:w-md">
+        {#if files.length === 0}
+            <UploadForm onsubmit={handleSubmit}/>
+        {:else}
+            <UploadProgress {files} {bank} {account}/>
+        {/if}
+    </div>
 </main>
