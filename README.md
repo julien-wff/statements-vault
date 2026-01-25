@@ -27,6 +27,5 @@ data from your bank into your budgeting app faster and more accurate.
 
 ### Setup
 
-1. **Install**: `bun install`
-2. **Database**: `bun run db:push`
+1. **Install**: `bun install --frozen-lockfile`
 3. **Run**: `bun --bun run dev`
