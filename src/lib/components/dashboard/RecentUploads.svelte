@@ -4,6 +4,7 @@
     import type { banksEnum } from '$lib/server/db/schema';
 
     interface FileEntry {
+        id: number;
         name: string;
         date: string | null;
         transactions: number;
@@ -82,9 +83,10 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-right">
-                            <button class="cursor-pointer text-[10px] font-black text-blue-600 hover:text-blue-800 uppercase tracking-widest bg-blue-50 px-3 py-1.5 rounded-lg transition-colors">
+                            <a class="block cursor-pointer text-[10px] font-black text-blue-600 hover:text-blue-800 uppercase tracking-widest bg-blue-50 px-3 py-1.5 rounded-lg transition-colors"
+                               href="/uploads/{file.id}">
                                 Inspect
-                            </button>
+                            </a>
                         </td>
                     </tr>
                 {/each}

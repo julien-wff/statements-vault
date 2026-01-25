@@ -108,9 +108,10 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 text-right">
-                                        <button class="cursor-pointer text-[10px] font-black text-blue-600 hover:text-blue-800 uppercase tracking-widest bg-blue-50 px-3 py-1.5 rounded-lg transition-colors">
+                                        <a href="/uploads/{file.id}"
+                                           class="text-[10px] font-black text-blue-600 hover:text-blue-800 uppercase tracking-widest bg-blue-50 px-3 py-1.5 rounded-lg transition-colors">
                                             Inspect
-                                        </button>
+                                        </a>
                                     </td>
                                 </tr>
                             {/each}
