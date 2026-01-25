@@ -148,6 +148,8 @@
                                                     class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                                     disabled={deletingRuleId === rule.id}
                                                     onclick={() => handleDelete(rule.id)}
+                                                    class:cursor-pointer={deletingRuleId !== rule.id}
+                                                    class:cursor-loading={deletingRuleId === rule.id}
                                                     title="Delete rule"
                                             >
                                                 {#if deletingRuleId === rule.id}
