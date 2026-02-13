@@ -1,5 +1,9 @@
 import type { Transaction } from '../index';
 import type { TableColumns, TextNodeFeatures } from './parse-page';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.extend(customParseFormat);
 
 const inRange = (value: number, range: readonly [ number, number ]) => value >= range[0] && value <= range[1];
 
@@ -10,7 +14,7 @@ const inRange = (value: number, range: readonly [ number, number ]) => value >= 
  * @param dateToParse The date string in dd/mm format.
  * @returns The parsed Date object.
  */
-function parseDate(startDate: Date, dateToParse: string): Date {
+function parseEndDate(startDate: Date, dateToParse: string): Date {
     const [ dayStr, monthStr ] = dateToParse.trim().split('/');
     let day = Number.parseInt(dayStr, 10);
     let month = Number.parseInt(monthStr, 10);
@@ -22,6 +26,36 @@ function parseDate(startDate: Date, dateToParse: string): Date {
     }
 
     return new Date(year, month - 1, day);
+}
+
+const startDateRegex = / (\d{2}\.\d{2}\.\d{2}) /;
+
+/**
+ * Parse the start date from the description.
+ * It extracts a date in the format dd.mm.yy and checks if it is within a reasonable range of the end date
+ * @param description The transaction description that may contain the start date in the format dd.mm.yy
+ * @param endDate The end date to compare the parsed start date against
+ * @returns The parsed start date in ISO format if valid, otherwise null
+ */
+function parseStartDate(description: string, endDate: string): string | null {
+    const dateMatch = startDateRegex.exec(description);
+    if (!dateMatch) {
+        return null;
+    }
+
+    const startDate = dayjs(dateMatch[1], 'DD.MM.YY', 'fr', true);
+    if (!startDate.isValid()) {
+        return null;
+    }
+
+    const endDateDjs = dayjs(endDate);
+
+    // -15 days <> endDate <> +1 day
+    if (startDate.isBefore(endDateDjs.subtract(15, 'day')) || startDate.isAfter(endDateDjs.add(1, 'day'))) {
+        return null;
+    }
+
+    return startDate.toISOString();
 }
 
 export function extractTable(columns: TableColumns, nodes: TextNodeFeatures[], startDate: Date) {
@@ -38,8 +72,10 @@ export function extractTable(columns: TableColumns, nodes: TextNodeFeatures[], s
         }
 
         if (inRange(node.x, dateX)) {
+            const endDate = parseEndDate(startDate, node.text).toISOString();
             transactions.push({
-                date: parseDate(startDate, node.text).toISOString(),
+                startDate: endDate,
+                endDate,
                 description: '',
                 amount: 0,
                 currency: 'EUR',
@@ -73,6 +109,14 @@ export function extractTable(columns: TableColumns, nodes: TextNodeFeatures[], s
             const amount = Number.parseFloat(amountText);
             lastTransaction.amount = Number.isNaN(amount) ? 0 : amount;
             continue;
+        }
+    }
+
+    // Extract start date from description (dd.mm.yy)
+    for (const transaction of transactions) {
+        const parsedStartDate = parseStartDate(transaction.description, transaction.endDate);
+        if (parsedStartDate) {
+            transaction.startDate = parsedStartDate;
         }
     }
 

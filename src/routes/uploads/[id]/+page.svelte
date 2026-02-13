@@ -149,9 +149,9 @@
                             <tr class="hover:bg-slate-50/50 transition-colors group">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-1.5 text-xs font-bold text-slate-700"
-                                         title={fullDateFormatter.format(new Date(tr.date))}>
+                                         title={fullDateFormatter.format(new Date(tr.startDate))}>
                                         <Calendar size={12} class="text-slate-400"/>
-                                        {new Date(tr.date).toLocaleDateString()}
+                                        {new Date(tr.startDate).toLocaleDateString()}
                                     </div>
                                     <div class="flex items-center gap-1.5 text-[10px] font-medium text-slate-400 mt-1">
                                         <Landmark size={10}/>

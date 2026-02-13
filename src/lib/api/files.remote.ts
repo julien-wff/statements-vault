@@ -16,7 +16,7 @@ export const getLatestFiles = query(async () => {
             id: file.id,
             transactions: count(),
             name: file.name,
-            date: max(transaction.date),
+            date: max(transaction.startDate),
             accountName: account.name,
             accountBank: account.bank,
         })
@@ -34,14 +34,14 @@ export const getAllFiles = query(async () => {
             id: file.id,
             transactions: count(),
             name: file.name,
-            date: max(transaction.date),
+            date: max(transaction.startDate),
             accountName: account.name,
             accountBank: account.bank,
         })
         .from(file)
         .leftJoin(transaction, eq(transaction.fileId, file.id))
         .leftJoin(account, eq(transaction.accountId, account.id))
-        .orderBy(desc(transaction.date))
+        .orderBy(desc(transaction.startDate))
         .groupBy(file.id);
 });
 
@@ -64,7 +64,7 @@ export const getFileDetailsById = query(z.int().positive(), async id => {
                 },
             },
         },
-        orderBy: desc(transaction.date),
+        orderBy: desc(transaction.startDate),
     });
 
     return {

@@ -22,7 +22,7 @@
         (await transactionsPromise)
             ?.map(tr => ({
                 ...tr,
-                date: new Date(tr.date),
+                date: new Date(tr.startDate),
                 account: accounts.find(acc => acc.id === tr.accountId)!,
             }))
             .toSorted((a, b) => b.date.getTime() - a.date.getTime()) ?? [],

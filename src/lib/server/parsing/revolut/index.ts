@@ -31,11 +31,13 @@ const readCsv = (file: string) =>
 
 function transformCsv(lines: RevolutCsvLine[], fileId: number, accountId: number): JsonTransactionReport {
     const transactions: Transaction[] = lines.map(line => {
-        const date = new Date(line['Completed Date']);
+        const startDate = new Date(line['Started Date']);
+        const endDate = new Date(line['Completed Date']);
         const amount = Number.parseFloat(line['Amount'].replace(',', '.'));
         const currency = line['Currency'];
         return {
-            date: date.toISOString(),
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString(),
             description: line['Description'],
             amount,
             currency,
@@ -44,7 +46,8 @@ function transformCsv(lines: RevolutCsvLine[], fileId: number, accountId: number
         } satisfies Transaction;
     });
 
-    const startDate = new Date(transactions.at(0)!.date);
+    // When selecting months on a Revolut export, the statements are filtered by the end date
+    const startDate = new Date(transactions.at(0)!.endDate);
     const startBalance =
         lines.length > 0
             ? Number.parseFloat(lines.at(0)!['Balance'].replace(',', '.')) -

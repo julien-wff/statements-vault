@@ -2,8 +2,12 @@ import { parseFile } from 'fast-csv';
 import type { Transaction } from '$lib/server/parsing';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
+import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';
 
 dayjs.extend(customParseFormat);
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 interface PaypalCsvLine {
     'Date': string;
@@ -45,14 +49,15 @@ export async function parsePaypalCsv(filePath: string, fileId: number, accountId
     const csvLines = await readCsv(filePath);
 
     const transactions = csvLines.map(line => {
-        const date = dayjs(`${line['Date']} ${line['Heure']}`, 'DD/MM/YYYY HH:mm:ss')
-            .toDate();
-        console.log(date, line['Date'], line['Heure'], line['Fuseau horaire']);
+        const date = dayjs
+            .tz(`${line['Date']} ${line['Heure']}`, 'DD/MM/YYYY HH:mm:ss', line['Fuseau horaire'])
+            .toISOString();
         const amount = Number.parseFloat(line['Net'].replace(',', '.'));
         const predictedBalance = Number.parseFloat(line['Solde'].replace(',', '.'));
 
         return {
-            date: date.toISOString(),
+            startDate: date,
+            endDate: date,
             description: line['Description'] + (line['Nom'] ? ` - ${line['Nom']}` : ''),
             amount,
             currency: line['Devise'],
@@ -62,7 +67,7 @@ export async function parsePaypalCsv(filePath: string, fileId: number, accountId
         } satisfies Transaction;
     });
 
-    const startDate = new Date(transactions.at(0)!.date);
+    const startDate = new Date(transactions.at(0)!.startDate);
     const startBalance = transactions.at(0)!.predictedBalance - transactions.at(0)!.amount;
     const endBalance = transactions.at(-1)!.predictedBalance;
 

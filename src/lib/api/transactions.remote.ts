@@ -36,7 +36,8 @@ export const getTransactionToCategorize = query(async () => {
         .select({
             id: transaction.id,
             description: transaction.description,
-            date: transaction.date,
+            startDate: transaction.startDate,
+            endDate: transaction.endDate,
             amount: transaction.amount,
             accountId: transaction.accountId,
             currency: transaction.currency,
